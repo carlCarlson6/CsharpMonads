@@ -4,7 +4,7 @@ public class Maybe<T>
 {
     internal Maybe() { }
 
-    private static Maybe<T> Create(T? value) => value is null ? new None<T>() : new Some<T>(value);
+    public static Maybe<T> Create(T? value) => value is null ? new None<T>() : new Some<T>(value);
 
     public static Maybe<T> Some(T value) => Create(value);
     public static Maybe<T> None() => new None<T>();
@@ -28,7 +28,7 @@ public static class MaybeExtensions
         _ => throw new ArgumentOutOfRangeException(nameof(maybe))
     };
     
-    public static TOut Match<T, TOut>(this Maybe<T> maybe, Func<T, TOut> onSome, Func<TOut> onNone) => maybe switch
+    public static TOut Map<T, TOut>(this Maybe<T> maybe, Func<T, TOut> onSome, Func<TOut> onNone) => maybe switch
     {
         None<T> => onNone(),
         Some<T> some => onSome(some.Value),
@@ -41,5 +41,18 @@ public static class MaybeExtensions
         Some<Maybe<T>> some => some.Value,
         _ => throw new ArgumentOutOfRangeException(nameof(maybeMaybe))
     };
+
+    public static Result<T> ToResult<T>(this Maybe<T> maybe) => maybe switch
+    {
+        None<T> _ => Result<T>.Ko(new NotFoundError(typeof(T))),
+        Some<T> some => Result<T>.Ok(some.Value),
+        _ => throw new ArgumentOutOfRangeException(nameof(maybe))
+    };
+    
+    public static Maybe<T> Find<T>(this IEnumerable<T> sourceList, Func<T, bool> predicate)
+    {
+        var elementFound = sourceList.FirstOrDefault(predicate);
+        return elementFound is null ? Maybe<T>.None() : Maybe<T>.Some(elementFound);
+    }
 }
 

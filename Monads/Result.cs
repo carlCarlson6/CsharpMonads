@@ -6,6 +6,7 @@ public class Result<T>
 
     public static Result<T> Ok(T value) => new OkResult<T>(value);
     public static Result<T> Ko(Error error) => new KoResult<T>(error);
+    public static Result<T> Ko(string error) => new KoResult<T>(new Error(error));
 }
 
 internal sealed class OkResult<T> : Result<T>
@@ -24,7 +25,13 @@ internal sealed class KoResult<T> : Result<T>
 
 public class Error : Exception
 {
-    public Error(string message) : base(message) { }
+    public Error() {}
+    public Error(string message) : base(message) {}
+}
+
+internal class NotFoundError : Error 
+{
+    public NotFoundError(Type type) : base($"element {type.FullName} not found") { }
 }
 
 public static class ResultExtensions
@@ -36,7 +43,7 @@ public static class ResultExtensions
         _ => throw new ArgumentOutOfRangeException(nameof(result))
     };
     
-    public static TOut Match<T, TOut>(this Result<T> result, Func<T, TOut> onOkResult, Func<Error, TOut> onKoResult) => result switch
+    public static TOut Map<T, TOut>(this Result<T> result, Func<T, TOut> onOkResult, Func<Error, TOut> onKoResult) => result switch
     {
         KoResult<T> koResult => onKoResult(koResult.Error),
         OkResult<T> okResult => onOkResult(okResult.Value),
