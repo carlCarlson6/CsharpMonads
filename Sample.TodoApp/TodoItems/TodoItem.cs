@@ -1,4 +1,3 @@
-using Ardalis.SmartEnum;
 using Newtonsoft.Json;
 using ValueOf;
 
@@ -19,6 +18,7 @@ public class TodoItem
         Title = title;
         Description = description;
         Status = status;
+        CreatedAt = createdAt;
     }
 
     public static TodoItem NewItem(string title, string description) => 

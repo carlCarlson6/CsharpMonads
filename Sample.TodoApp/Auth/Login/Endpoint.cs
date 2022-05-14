@@ -10,10 +10,10 @@ namespace Sample.TodoApp.Auth.Login;
 [HttpPost(ApiUris.Login), AllowAnonymous]
 public class Endpoint : Endpoint<LoginRequest, LoginResponse>
 {
-    private const string SigningKey = ")H@McQfTjWnZr4u7x!z%C*F-JaNdRgUkXp2s5v8y/B?D(G+KbPeShVmYq3t6w9z$"; // TODO move to config
+    private readonly JwtGenerator _jwtGenerator;
     private readonly IDocumentStore _store;
-    public Endpoint(IDocumentStore store) => _store = store;
-    
+    public Endpoint(IDocumentStore store, JwtGenerator jwtGenerator) => (_store, _jwtGenerator) = (store, jwtGenerator);
+
     private readonly Result<User> _invalidCredentialsResult = Result<User>.Ko("The supplied credentials are invalid!");
 
     public override async Task HandleAsync(LoginRequest loginRequest, CancellationToken cancellationToken)
@@ -26,7 +26,7 @@ public class Endpoint : Endpoint<LoginRequest, LoginResponse>
             () => _invalidCredentialsResult);
         
         var response = resultUser.Map<User, LoginResponse>(
-            user => SuccessfulLoginResponse.Create(user, SigningKey), 
+            user => new SuccessfulLoginResponse{ Token = _jwtGenerator.Generate(user) }, 
             error => new ErrorLoginResponse{ Message = error.Message });
 
         Func<Task> sendResponse = response switch

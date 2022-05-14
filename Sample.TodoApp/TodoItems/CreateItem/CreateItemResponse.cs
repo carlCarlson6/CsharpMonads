@@ -1,6 +1,6 @@
 namespace Sample.TodoApp.TodoItems.CreateItem;
 
-public class Response
+public class CreateItemResponse
 {
     public string Message { get; } = "Item created successfully";
 }

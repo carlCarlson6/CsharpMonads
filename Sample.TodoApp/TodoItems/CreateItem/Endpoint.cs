@@ -7,7 +7,7 @@ namespace Sample.TodoApp.TodoItems.CreateItem;
 // ReSharper disable once UnusedType.Global
 
 [HttpPost(ApiUris.TodoItem)]
-public class Endpoint : Endpoint<CreateItemRequest, Response>
+public class Endpoint : Endpoint<CreateItemRequest, CreateItemResponse>
 {
     private readonly IDomainService<CreateItemRequest, TodoItemId> _service;
 
@@ -21,6 +21,6 @@ public class Endpoint : Endpoint<CreateItemRequest, Response>
 
     private Task HandleEndpointResult(Result<TodoItemId> result) => result.Map(OnOkResult, OnKoResult);
     private Task OnOkResult(TodoItemId id) => 
-        SendCreatedAtAsync<GetItem.Endpoint>(new RoutesValueResponse(id.ToString()), new Response());
+        SendCreatedAtAsync<GetItem.Endpoint>(new RoutesValueResponse(id.ToString()), new CreateItemResponse());
     private Task OnKoResult(Error _) => SendErrorsAsync();
 }

@@ -23,8 +23,8 @@ public class CreateItemEndpointTests : BaseApiTestWithRavenDb
         
         httpResponse.IsSuccessStatusCode.Should().BeTrue();
 
-        (await httpResponse.Content.ReadFromJsonAsync<Response>())!
-            .Should().BeEquivalentTo(new Response());
+        (await httpResponse.Content.ReadFromJsonAsync<CreateItemResponse>())!
+            .Should().BeEquivalentTo(new CreateItemResponse());
 
         using var session = DocumentStore.OpenAsyncSession();
         var userItems = await session.LoadUserTodoItemsAsync(UserTodoItemsId.From(TestUsers.TestUserCarl.Id));

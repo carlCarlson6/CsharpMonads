@@ -1,0 +1,1 @@
+export type LogoutUser = () => Promise<void>; 
